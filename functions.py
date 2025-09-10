@@ -11,15 +11,15 @@ def pivot_90_left():
   alvik.set_wheels_speed(-30, 30)
   delay(1350)
 
-def forward(R, t):
-  alvik.set_wheels_speed((R * 1000), (R * 1000))
-  delay(t)
-  alvik.set_wheels_speed(0, 0)
+def forward(speed, t):
+    alvik.set_wheels_speed(speed, speed)  # use speed directly
+    delay(t * 1000)  # convert seconds to ms
+    alvik.set_wheels_speed(0, 0)
 
-def backward(R, t):
-  alvik.set_wheels_speed(-(R * 1000), -(R * 1000))
-  delay(t)
-  alvik.set_wheels_speed(0, 0)
+def backward(speed, t):
+    alvik.set_wheels_speed(-speed, -speed)
+    delay(t * 1000)
+    alvik.set_wheels_speed(0, 0)
   
 
 def setup():
