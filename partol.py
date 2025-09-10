@@ -13,9 +13,15 @@ def loop():
   alvik.set_wheels_speed(30, -30)
   delay(1350)
   alvik.set_wheels_speed(30, 30)
-  delay(6000)
-  alvik.set_wheels_speed(0, 30)
-  delay(2000)
+  delay(7000)
+  alvik.set_wheels_speed(30, -30)
+  delay(1350)  
+  alvik.set_wheels_speed(30, 30)
+  delay(7000)  
+  alvik.set_wheels_speed(30, -30)
+  delay(2700)
+
+  
   
 def cleanup():
   alvik.stop()
