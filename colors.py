@@ -73,7 +73,7 @@ def checkIfNewColor(r, g, b):
         diff_b = 0
         return False
 
-    margin = 25
+    margin = 35
     # make sure we have all 3 colors
     if len(average_color) == 3:
         if diff_r > margin or diff_g > margin or diff_b > margin:  # margin
@@ -128,7 +128,7 @@ def turnAround():
 
 
 def evaluate(colors):
-    margin = 15
+    margin = 35
     unique = []
 
     # enumerate for getting index + value
@@ -158,7 +158,7 @@ def driveBack(unique):
     return False
 
 def checkIfFoundUique(unique, currentColor):
-    margin = 15
+    margin = 35
     if all(abs(unique[i] - currentColor[i]) <= margin for i in range(3)):
         return True
     return False

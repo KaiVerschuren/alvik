@@ -1,61 +1,70 @@
 from arduino import *
 from arduino_alvik import ArduinoAlvik
-import time
 
 alvik = ArduinoAlvik()
 
-scripts = [
-    {"name": "Escape Room",   "file": "colors.py",   "color": (1, 0, 0)},  # red
-    {"name": "Walk the Bridge","file": "NoWayOut.py","color": (0, 1, 0)},  # green
-    {"name": "Rainbow Road",  "file": "level1.py",   "color": (0, 0, 1)},  # blue
-]
+currentPitch = 0;
 
-index = 0
-pressed = False
-DEBOUNCE = 0.12
+state = 0
 
-def show_color():
-    c = scripts[index]["color"]
-    alvik.left_led.set_color(c[0], c[1], c[2])
-    alvik.right_led.set_color(c[0], c[1], c[2])
+hasGoneDown = False
+
+STATE_BEFORE_RAMP = 1
+STATE_UP_RAMP = 2
+STATE_WAIT_RAMP = 3
+STATE_DOWN_RAMP = 4
+STATE_END = 5
+
+def getOrientation():
+  roll, pitch, yaw = alvik.get_orientation()
+
+  roll, pitch, yaw = round(roll, 2), round(pitch, 2), round(yaw, 2)
+  currentPitch = pitch
+  print("Pitch: ", pitch, "| State: ", state)
+  return pitch
 
 def setup():
-    alvik.begin()
-    show_color()
+  alvik.begin()
+  delay(1000)
 
 def loop():
-    global index, pressed
+    global state, currentPitch, hasGoneDown
 
-    up = alvik.get_touch_up()
-    down = alvik.get_touch_down()
-    ok = alvik.get_touch_ok()
+    pitch = getOrientation()
 
-    if not pressed:
-        if up:
-            index = (index + 1) % len(scripts)
-            show_color()
-            pressed = True
+    if state == 0:
+        state = STATE_BEFORE_RAMP
 
-        elif down:
-            index = (index - 1) % len(scripts)
-            show_color()
-            pressed = True
+    elif state == STATE_BEFORE_RAMP:
+        alvik.set_wheels_speed(20, 20)
+        if pitch <= 10:
+            state = STATE_UP_RAMP
 
-        elif ok:
-            try:
-                exec(open(scripts[index]["file"]).read())
-            except Exception as e:
-                print("Error:", e)
-            pressed = True
+    elif state == STATE_UP_RAMP:
+        alvik.set_wheels_speed(20, 20)
+        if abs(pitch) < 2:
+            state = STATE_WAIT_RAMP
 
-    if not (up or down or ok):
-        pressed = False
+    elif state == STATE_WAIT_RAMP:
+        alvik.set_wheels_speed(0, 0)
+        delay(1000)
+        alvik.set_wheels_speed(20, 20)
 
-    time.sleep(DEBOUNCE)
+        state = STATE_DOWN_RAMP
+
+    elif state == STATE_DOWN_RAMP:
+        alvik.set_wheels_speed(20, 20)
+        if abs(pitch) > 4:
+            if hasGoneDown == False:
+              hasGoneDown = True
+              print(hasGoneDown)
+        if abs(pitch) < 2 and hasGoneDown == True:
+            alvik.set_wheels_speed(0, 0)
+    delay(200)
+
 
 def cleanup():
-    alvik.left_led.set_color(0, 0, 0)
-    alvik.right_led.set_color(0, 0, 0)
-    alvik.stop()
+  alvik.stop()
 
 start(setup, loop, cleanup)
+
