@@ -10,10 +10,9 @@ def calibration():
 
     alvik.set_wheels_speed(-15, 15)
 
-    for _ in range(1000):
+    for _ in range(3000):
         left, cleft, center, cright, right = alvik.get_distance()
-        delay(10)
-
+        delay(1)
         if center > Distance:
             Distance = center
             alvik.left_led.set_color(1, 0, 0)
@@ -42,10 +41,13 @@ def FindExit():
             delay(500)
 
             alvik.set_wheels_speed(30, 30)
-            delay(20000)
+            while True:
+              delay(100)
+              L, CL, C, CR, R = alvik.get_distance()
 
-            alvik.set_wheels_speed(0, 0)
-            break
+              if C < 15:
+                  alvik.set_wheels_speed(0, 0)
+                  break
 
 
 
